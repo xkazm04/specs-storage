@@ -1,0 +1,32 @@
+{
+  "items": [
+    {
+      "type": "divider",
+      "title": "APIS"
+    },
+    {
+      "type": "item",
+      "title": "Storage services",
+      "uri": "reference/Storage.yaml"
+    },
+    {
+      "type": "item",
+      "title": "Log services",
+      "uri": "reference/Record.yaml"
+    },
+    {
+      "type": "divider",
+      "title": "Guides"
+    },
+        {
+      "type": "item",
+      "title": "Store to IPFS for free",
+      "uri": "docs/store-ipfs.md"
+    },
+    {
+      "type": "item",
+      "title": "Store metadata to IPFS and include it in an NFT",
+      "uri": "docs/use-nft-metadata.md"
+    }
+  ]
+}

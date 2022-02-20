@@ -1,0 +1,345 @@
+openapi: 3.0.1
+info:
+  contact: {}
+  title: Storage services
+  version: 3.9.2
+  x-logo:
+    url: 'https://tatum.io/images/logo.svg'
+    altText: Tatum
+  description: IPFS is a distributed file storage. You can store data to IPFS and read from them.
+servers:
+  - url: 'https://api-eu1.tatum.io'
+  - url: 'https://api-us-west1.tatum.io'
+tags:
+  - description: ''
+    name: IPFS
+paths:
+  '/v3/ipfs/{id}':
+    get:
+      description: <h4>1 credit per API call.</h4><br/><p>Gets data from the IPFS.</p>
+      operationId: GetIPFSData
+      summary: Get file from IPFS
+      tags:
+        - IPFS
+      parameters:
+        - description: IPFS CID of the file
+          in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            example: QmXJJ6UF5WkF4WTJvsdhiA1etGwBLfpva7Vr9AudGMe3pj
+      responses:
+        '200':
+          content:
+            '*':
+              schema:
+                type: string
+                format: binary
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    example: validation.failed
+                    description: validation.failed
+                    type: string
+                  message:
+                    example: Request validation failed. Please see data for additional information.
+                    description: Request validation failed. Please see data for additional information.
+                    type: string
+                  statusCode:
+                    example: 400
+                    description: '400'
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - target
+                      properties:
+                        target:
+                          type: object
+                          additionalProperties: true
+                          description: Request object present in the body of the HTTP request
+                          example:
+                            property: 12345
+                        value:
+                          type: number
+                          description: 'Value of the target object which validation is wrong. Can be of any data type, example here is using type number.'
+                          example: 12345
+                        property:
+                          type: string
+                          description: Property name of the target object which validation is wrong
+                          example: property1
+                        constraints:
+                          type: object
+                          additionalProperties: true
+                          description: 'Object of failed constraints for the target object. Key is the constraint, value is detailed description of the failed constraint.'
+                          example:
+                            min: property1 must not be less than 50000
+                required:
+                  - errorCode
+                  - message
+                  - statusCode
+                  - data
+                type: object
+          description: Bad Request. Validation failed for the given object in the HTTP Body or Request parameters.
+        '401':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - properties:
+                      errorCode:
+                        example: subscription.not.active
+                        description: subscription.not.active
+                        type: string
+                      message:
+                        example: Subscription not active anymore.
+                        description: Subscription not active anymore.
+                        type: string
+                      statusCode:
+                        example: 401
+                        description: '401'
+                        type: number
+                    required:
+                      - errorCode
+                      - message
+                      - statusCode
+                    type: object
+                  - properties:
+                      errorCode:
+                        example: subscription.invalid
+                        description: subscription.invalid
+                        type: string
+                      message:
+                        example: 'Unable to find valid subscription for ''${apiKey}'''
+                        description: 'Unable to find valid subscription for ''${apiKey}'''
+                        type: string
+                      statusCode:
+                        example: 401
+                        description: '401'
+                        type: number
+                    required:
+                      - errorCode
+                      - message
+                      - statusCode
+                    type: object
+          description: Unauthorized. Not valid or inactive subscription key present in the HTTP Header.
+        '403':
+          description: 'Forbidden. The request is authenticated, but it is not possible to perform the required operation due to a logical error or invalid permissions.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - properties:
+                      message:
+                        example: Forbidden
+                        description: Forbidden
+                        type: string
+                      statusCode:
+                        example: 403
+                        description: '403'
+                        type: number
+                    required:
+                      - statusCode
+                      - message
+                    type: object
+        '500':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Internal server error
+                    description: Internal server error
+                    type: string
+                  statusCode:
+                    example: 500
+                    description: '500'
+                    type: number
+                required:
+                  - statusCode
+                  - message
+                type: object
+          description: Internal server error. There was an error on the server while processing the request.
+      security:
+        - X-Api-Key: []
+  /v3/ipfs:
+    post:
+      description: |
+        <h4>2 credits per API call. Only files up to 50MB are available for storing.</h4><br/>
+        <p>Stores file on the IPFS. We are leveraging <a href="https://nft.storage/" target="_blank">nft.storage</a> from <a href="https://protocol.ai/" target="_blank">Protocol Labs</a> for free storage on the IPFS.</p>
+      operationId: StoreIPFS
+      summary: Store data to IPFS
+      tags:
+        - IPFS
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  example: '127654187631872620'
+                  description: Your file to store
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ipfsHash:
+                    type: string
+                    description: IPFS CID identifier of the stored file.
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                properties:
+                  errorCode:
+                    example: validation.failed
+                    description: validation.failed
+                    type: string
+                  message:
+                    example: Request validation failed. Please see data for additional information.
+                    description: Request validation failed. Please see data for additional information.
+                    type: string
+                  statusCode:
+                    example: 400
+                    description: '400'
+                    type: number
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      required:
+                        - target
+                      properties:
+                        target:
+                          type: object
+                          additionalProperties: true
+                          description: Request object present in the body of the HTTP request
+                          example:
+                            property: 12345
+                        value:
+                          type: number
+                          description: 'Value of the target object which validation is wrong. Can be of any data type, example here is using type number.'
+                          example: 12345
+                        property:
+                          type: string
+                          description: Property name of the target object which validation is wrong
+                          example: property1
+                        constraints:
+                          type: object
+                          additionalProperties: true
+                          description: 'Object of failed constraints for the target object. Key is the constraint, value is detailed description of the failed constraint.'
+                          example:
+                            min: property1 must not be less than 50000
+                required:
+                  - errorCode
+                  - message
+                  - statusCode
+                  - data
+                type: object
+          description: Bad Request. Validation failed for the given object in the HTTP Body or Request parameters.
+        '401':
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - properties:
+                      errorCode:
+                        example: subscription.not.active
+                        description: subscription.not.active
+                        type: string
+                      message:
+                        example: Subscription not active anymore.
+                        description: Subscription not active anymore.
+                        type: string
+                      statusCode:
+                        example: 401
+                        description: '401'
+                        type: number
+                    required:
+                      - errorCode
+                      - message
+                      - statusCode
+                    type: object
+                  - properties:
+                      errorCode:
+                        example: subscription.invalid
+                        description: subscription.invalid
+                        type: string
+                      message:
+                        example: 'Unable to find valid subscription for ''${apiKey}'''
+                        description: 'Unable to find valid subscription for ''${apiKey}'''
+                        type: string
+                      statusCode:
+                        example: 401
+                        description: '401'
+                        type: number
+                    required:
+                      - errorCode
+                      - message
+                      - statusCode
+                    type: object
+          description: Unauthorized. Not valid or inactive subscription key present in the HTTP Header.
+        '403':
+          description: 'Forbidden. The request is authenticated, but it is not possible to perform the required operation due to a logical error or invalid permissions.'
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - properties:
+                      message:
+                        example: Forbidden
+                        description: Forbidden
+                        type: string
+                      statusCode:
+                        example: 403
+                        description: '403'
+                        type: number
+                    required:
+                      - statusCode
+                      - message
+                    type: object
+        '500':
+          content:
+            application/json:
+              schema:
+                properties:
+                  message:
+                    example: Internal server error
+                    description: Internal server error
+                    type: string
+                  statusCode:
+                    example: 500
+                    description: '500'
+                    type: number
+                required:
+                  - statusCode
+                  - message
+                type: object
+          description: Internal server error. There was an error on the server while processing the request.
+      security:
+        - X-Api-Key: []
+components:
+  securitySchemes:
+    X-Api-Key:
+      description: |
+        To maintain the highest security level, Tatum requires X-API-Key HTTP header.
+        This X-API-Key represents identification of the plan and can be used by 1 developer or per environment.
+        Each X-API-Key is bound to the test or production blockchains.
+      in: header
+      name: x-api-key
+      type: apiKey
