@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   contact: {}
   title: Storage services
-  version: 3.9.3
+  version: 3.9.4
   x-logo:
     url: 'https://tatum.io/images/logo.svg'
     altText: Tatum
