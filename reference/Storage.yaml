@@ -29,6 +29,13 @@ paths:
           schema:
             type: string
             example: QmXJJ6UF5WkF4WTJvsdhiA1etGwBLfpva7Vr9AudGMe3pj
+        - description: For connection without API key. To differentiate between testnet and mainnet, please supply a ?type=testnet|mainnet query parameter with your calls
+          in: query
+          name: type
+          required: false
+          schema:
+            type: boolean
+            example: false
       responses:
         '200':
           content:
@@ -178,6 +185,14 @@ paths:
       summary: Store data to IPFS
       tags:
         - IPFS
+      parameters:
+        - description: For connection without API key. To differentiate between testnet and mainnet, please supply a ?type=testnet|mainnet query parameter with your calls
+          in: query
+          name: type
+          required: false
+          schema:
+            type: boolean
+            example: false
       requestBody:
         content:
           multipart/form-data:
@@ -340,6 +355,11 @@ components:
         To maintain the highest security level, Tatum requires X-API-Key HTTP header.
         This X-API-Key represents identification of the plan and can be used by 1 developer or per environment.
         Each X-API-Key is bound to the test or production blockchains.
+
+        Connecting without an X-API-Key results in the creation of an API Key tied to your IP Address.
+        This API Key is limited to 5req/s and 10M credits, these limits are renewed the 1st day of each month and are applicable to both testnet and mainnet.
+        To differentiate between testnet and mainnet, please supply a ?type=testnet|mainnet query parameter with your calls, otherwise the api key will default to mainnet.
+        You do not need to supply an API key in the X-API-Key header.
       in: header
       name: x-api-key
       type: apiKey
