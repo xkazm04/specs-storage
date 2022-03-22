@@ -34,8 +34,9 @@ paths:
           name: type
           required: false
           schema:
-            type: boolean
-            example: false
+            type: string
+            example: testnet
+            default: mainnet
       responses:
         '200':
           content:
@@ -191,8 +192,9 @@ paths:
           name: type
           required: false
           schema:
-            type: boolean
-            example: false
+            type: string
+            example: testnet
+            default: mainnet
       requestBody:
         content:
           multipart/form-data:
